@@ -20,6 +20,7 @@ import {
 } from 'react-icons/fi'
 import { IoPawOutline } from 'react-icons/io5'
 import NavItem from './NavItem.jsx'
+import { SearchIcon } from '@chakra-ui/icons';
 
 const Sidebar = () => {
     const [navSize, setNavSize] = useState("large")
@@ -63,7 +64,7 @@ const Sidebar = () => {
                 />
                 <NavItem   id ="1" navSize={navSize} icon={FiHome} title="Acceuil" hundleFocus={(event)=> hundleFocus(event,"1")} actifId={actifId}/> 
                 <NavItem  id ="2" navSize={navSize} icon={FiBriefcase} title="Ouvrage" hundleFocus={(event)=> hundleFocus(event,"2")} actifId={actifId}  path="/ouvrage"/>
-                <NavItem  id ="3" navSize={navSize} icon={FiBriefcase} title="Search" hundleFocus={(event)=> hundleFocus(event,"3")} actifId={actifId}  path="/Search"/>
+                <NavItem  id ="3" navSize={navSize} icon={SearchIcon} title="Search" hundleFocus={(event)=> hundleFocus(event,"3")} actifId={actifId}  path="/Search"/>
             </Flex>
 
             <Flex             
