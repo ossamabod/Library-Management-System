@@ -132,69 +132,72 @@ const SearchLivre = ({ data }) => {
             </Flex>
 
             {showTable && (
-                <Box overflowX="auto" mt={6} w="full">
-                    <Table variant="striped" colorScheme="yellow" size="md">
-                        <Thead bg="#265999" color="white">
-                            <Tr>
-                                <Th color="white">Book Name</Th>
-                                <Th color="white">Author Name</Th>
-                                <Th color="white">Edition Date</Th>
-                                <Th color="white">Type</Th>
-                                <Th color="white">Status</Th>
-                                <Th color="white">Action</Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            {paginatedData.length > 0 ? (
-                                paginatedData.map((item) => (
-                                    <Tr key={item.id}>
-                                        <Td>{item.bookName}</Td>
-                                        <Td>{item.authorName}</Td>
-                                        <Td>{item.editionDate}</Td>
-                                        <Td>{item.type}</Td>
-                                        <Td>{loanStatus[item.id] ? 'Loué' : 'Non Loué'}</Td>
-                                        <Td>
-                                            <Button
-                                                colorScheme={loanStatus[item.id] ? "red" : "green"}
-                                                onClick={loanStatus[item.id] ? undefined : () => handleLoanAction(item.id)}
-                                                isDisabled={loanStatus[item.id]}
-                                            >
-                                                {loanStatus[item.id] ? 'Loué' : 'Loan'}
-                                            </Button>
-                                        </Td>
-                                    </Tr>
-                                ))
-                            ) : (
-                                <Tr>
-                                    <Td colSpan="6" textAlign="center" color="gray.500">
-                                        No results found
-                                    </Td>
-                                </Tr>
-                            )}
-                        </Tbody>
-                    </Table>
+    <Box overflowX="auto" mt={6} w="full">
+        <Table size="md" bg="#f4f4f9">
+            <Thead bg="#3D313F">
+                <Tr>
+                    <Th color="white">Book Name</Th>
+                    <Th color="white">Author Name</Th>
+                    <Th color="white">Edition Date</Th>
+                    <Th color="white">Type</Th>
+                    <Th color="white">Status</Th>
+                    <Th color="white">Action</Th>
+                </Tr>
+            </Thead>
+            <Tbody>
+                {paginatedData.length > 0 ? (
+                    paginatedData.map((item, index) => (
+                        <Tr key={item.id} bg={index % 2 === 0 ? "#DCC1B0" : "#ADD8E6"}>
+                            <Td>{item.bookName}</Td>
+                            <Td>{item.authorName}</Td>
+                            <Td>{item.editionDate}</Td>
+                            <Td>{item.type}</Td>
+                            <Td>{loanStatus[item.id] ? 'Loué' : 'Non Loué'}</Td>
+                            <Td>
+                                <Button
+                                    colorScheme={loanStatus[item.id] ? "red" : "green"}
+                                    onClick={loanStatus[item.id] ? undefined : () => handleLoanAction(item.id)}
+                                    isDisabled={loanStatus[item.id]}
+                                >
+                                    {loanStatus[item.id] ? 'Loué' : 'Loan'}
+                                </Button>
+                            </Td>
+                        </Tr>
+                    ))
+                ) : (
+                    <Tr>
+                        <Td colSpan="6" textAlign="center" color="gray.500">
+                            No results found
+                        </Td>
+                    </Tr>
+                )}
+            </Tbody>
+        </Table>
 
-                    <Flex justify="center" align="center" mt={6} gap={4} color="#265999">
-                        <IconButton
-                            icon={<ArrowLeftIcon />}
-                            onClick={handlePreviousPage}
-                            isDisabled={currentPage === 1}
-                            colorScheme="blue"
-                            variant="ghost"
-                            size="lg"
-                        />
-                        <Text fontSize="lg" fontWeight="bold">Page {currentPage} of {totalPages}</Text>
-                        <IconButton
-                            icon={<ArrowRightIcon />}
-                            onClick={handleNextPage}
-                            isDisabled={currentPage === totalPages}
-                            colorScheme="blue"
-                            variant="ghost"
-                            size="lg"
-                        />
-                    </Flex>
-                </Box>
-            )}
+        <Flex justify="center" align="center" mt={6} gap={4} color="#265999">
+            <IconButton
+                icon={<ArrowLeftIcon />}
+                onClick={handlePreviousPage}
+                isDisabled={currentPage === 1}
+                colorScheme="blue"
+                variant="ghost"
+                size="lg"
+            />
+            <Text fontSize="lg" fontWeight="bold">Page {currentPage} of {totalPages}</Text>
+            <IconButton
+                icon={<ArrowRightIcon />}
+                onClick={handleNextPage}
+                isDisabled={currentPage === totalPages}
+                colorScheme="blue"
+                variant="ghost"
+                size="lg"
+            />
+        </Flex>
+    </Box>
+)}
+
+
+
         </Box>
     );
 };
