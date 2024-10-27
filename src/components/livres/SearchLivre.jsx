@@ -36,11 +36,8 @@ const SearchLivre = ({ data }) => {
         setCurrentPage(1);
     };
 
-    const toggleLoanStatus = (id) => {
-        setLoanStatus((prevStatus) => ({
-            ...prevStatus,
-            [id]: !prevStatus[id]
-        }));
+    const handleLoanAction = (id) => {
+        // Empty function placeholder
     };
 
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -56,7 +53,7 @@ const SearchLivre = ({ data }) => {
 
     return (
         <Box maxW="70%" mx="auto" mt="80px" p={8}>
-           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={6}>
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={6}>
                 <Flex align="center">
                     <Text fontWeight="medium" width="30%">Book Name:</Text>
                     <Input
@@ -159,9 +156,10 @@ const SearchLivre = ({ data }) => {
                                         <Td>
                                             <Button
                                                 colorScheme={loanStatus[item.id] ? "red" : "green"}
-                                                onClick={() => toggleLoanStatus(item.id)}
+                                                onClick={loanStatus[item.id] ? undefined : () => handleLoanAction(item.id)}
+                                                isDisabled={loanStatus[item.id]}
                                             >
-                                                {loanStatus[item.id] ? 'Return' : 'Loan'}
+                                                {loanStatus[item.id] ? 'Loué' : 'Loan'}
                                             </Button>
                                         </Td>
                                     </Tr>
@@ -176,7 +174,6 @@ const SearchLivre = ({ data }) => {
                         </Tbody>
                     </Table>
 
-                    {/* Majestic Pagination Controls */}
                     <Flex justify="center" align="center" mt={6} gap={4} color="#265999">
                         <IconButton
                             icon={<ArrowLeftIcon />}
