@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { Box, Input, Button, Select, Table, Thead, Tbody, Tr, Th, Td, Text, Flex, SimpleGrid, IconButton } from '@chakra-ui/react';
+import { Box, Input, Button, Select, Table, Thead, Tbody, Tr, Th, Td, Text, Flex, SimpleGrid, IconButton, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons';
+import { useToast } from '@chakra-ui/react'
+import axios from 'axios';
+
 
 const SearchLivre = ({ data }) => {
+  const toast = useToast(); 
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [bookName, setBookName] = useState('');
     const [authorName, setAuthorName] = useState('');
     const [editionDate, setEditionDate] = useState('');
@@ -14,6 +19,8 @@ const SearchLivre = ({ data }) => {
     const [loanStatus, setLoanStatus] = useState(
         data.reduce((acc, book) => ({ ...acc, [book.id]: book.loanStatus }), {})
     );
+    const [matricule, setMatricule] = useState(''); // State for matricule input
+    const [selectedBookId, setSelectedBookId] = useState(null); // State to store selected book ID
 
     const rowsPerPage = 5;
 
@@ -37,9 +44,60 @@ const SearchLivre = ({ data }) => {
     };
 
     const handleLoanAction = (id) => {
-        // Empty function placeholder
-    };
+      setSelectedBookId(id); // Store the selected book ID
+      onOpen(); // Open the modal
+  };
 
+  
+  const confirmLoan = async () => { // Add toast as a parameter
+    if (matricule) {
+        try {
+            const response = await axios.post('/api/loan', {
+                matricule,
+                bookId: selectedBookId,
+            });
+  
+            if (response.status === 200) {
+                setLoanStatus((prevStatus) => ({
+                    ...prevStatus,
+                    [selectedBookId]: true,
+                }));
+                
+                toast({
+                    title: "Loan confirmed successfully.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
+                
+                onClose(); 
+                setMatricule(''); 
+            } else {
+                toast({
+                    title: "Failed to loan the book. Please try again.",
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+        } catch (error) {
+            console.error("Error loaning the book:", error);
+            toast({
+                title: "An error occurred. Please try again.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+        }
+    } else {
+        toast({
+            title: "Please enter a valid matricule.",
+            status: "warning",
+            duration: 3000,
+            isClosable: true,
+        });
+    }
+  };
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     const paginatedData = filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
@@ -132,72 +190,91 @@ const SearchLivre = ({ data }) => {
             </Flex>
 
             {showTable && (
-    <Box overflowX="auto" mt={6} w="full">
-        <Table size="md" bg="#f4f4f9">
-            <Thead bg="#3D313F">
-                <Tr>
-                    <Th color="white">Book Name</Th>
-                    <Th color="white">Author Name</Th>
-                    <Th color="white">Edition Date</Th>
-                    <Th color="white">Type</Th>
-                    <Th color="white">Status</Th>
-                    <Th color="white">Action</Th>
-                </Tr>
-            </Thead>
-            <Tbody>
-                {paginatedData.length > 0 ? (
-                    paginatedData.map((item, index) => (
-                        <Tr key={item.id} bg={index % 2 === 0 ? "#DCC1B0" : "#ADD8E6"}>
-                            <Td>{item.bookName}</Td>
-                            <Td>{item.authorName}</Td>
-                            <Td>{item.editionDate}</Td>
-                            <Td>{item.type}</Td>
-                            <Td>{loanStatus[item.id] ? 'Loué' : 'Non Loué'}</Td>
-                            <Td>
-                                <Button
-                                    colorScheme={loanStatus[item.id] ? "red" : "green"}
-                                    onClick={loanStatus[item.id] ? undefined : () => handleLoanAction(item.id)}
-                                    isDisabled={loanStatus[item.id]}
-                                >
-                                    {loanStatus[item.id] ? 'Loué' : 'Loan'}
-                                </Button>
-                            </Td>
-                        </Tr>
-                    ))
-                ) : (
-                    <Tr>
-                        <Td colSpan="6" textAlign="center" color="gray.500">
-                            No results found
-                        </Td>
-                    </Tr>
-                )}
-            </Tbody>
-        </Table>
+                <Box overflowX="auto" mt={6} w="full">
+                    <Table size="md" bg="#f4f4f9">
+                        <Thead bg="#3D313F">
+                            <Tr>
+                                <Th color="white">Book Name</Th>
+                                <Th color="white">Author Name</Th>
+                                <Th color="white">Edition Date</Th>
+                                <Th color="white">Type</Th>
+                                <Th color="white">Status</Th>
+                                <Th color="white">Action</Th>
+                            </Tr>
+                        </Thead>
+                        <Tbody>
+                            {paginatedData.length > 0 ? (
+                                paginatedData.map((item, index) => (
+                                    <Tr key={item.id} bg={index % 2 === 0 ? "#DCC1B0" : "#ADD8E6"}>
+                                        <Td>{item.bookName}</Td>
+                                        <Td>{item.authorName}</Td>
+                                        <Td>{item.editionDate}</Td>
+                                        <Td>{item.type}</Td>
+                                        <Td>{loanStatus[item.id] ? 'Loué' : 'Non Loué'}</Td>
+                                        <Td>
+                                            <Button
+                                                colorScheme={loanStatus[item.id] ? "red" : "green"}
+                                                onClick={loanStatus[item.id] ? undefined : () => handleLoanAction(item.id)}
+                                                isDisabled={loanStatus[item.id]}
+                                            >
+                                                {loanStatus[item.id] ? 'Loué' : 'Loan'}
+                                            </Button>
+                                        </Td>
+                                    </Tr>
+                                ))
+                            ) : (
+                                <Tr>
+                                    <Td colSpan="6" textAlign="center" color="gray.500">
+                                        No results found
+                                    </Td>
+                                </Tr>
+                            )}
+                        </Tbody>
+                    </Table>
 
-        <Flex justify="center" align="center" mt={6} gap={4} color="#265999">
-            <IconButton
-                icon={<ArrowLeftIcon />}
-                onClick={handlePreviousPage}
-                isDisabled={currentPage === 1}
-                colorScheme="blue"
-                variant="ghost"
-                size="lg"
-            />
-            <Text fontSize="lg" fontWeight="bold">Page {currentPage} of {totalPages}</Text>
-            <IconButton
-                icon={<ArrowRightIcon />}
-                onClick={handleNextPage}
-                isDisabled={currentPage === totalPages}
-                colorScheme="blue"
-                variant="ghost"
-                size="lg"
-            />
-        </Flex>
-    </Box>
-)}
+                    <Flex justify="center" align="center" mt={6} gap={4} color="#265999">
+                        <IconButton
+                            icon={<ArrowLeftIcon />}
+                            onClick={handlePreviousPage}
+                            isDisabled={currentPage === 1}
+                            colorScheme="blue"
+                            variant="ghost"
+                            size="lg"
+                        />
+                        <Text fontSize="lg" fontWeight="bold">Page {currentPage} of {totalPages}</Text>
+                        <IconButton
+                            icon={<ArrowRightIcon />}
+                            onClick={handleNextPage}
+                            isDisabled={currentPage === totalPages}
+                            colorScheme="blue"
+                            variant="ghost"
+                            size="lg"
+                        />
+                    </Flex>
+                </Box>
+            )}
 
-
-
+            <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Enter Matricule</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Input
+                            placeholder="Enter your matricule"
+                            value={matricule}
+                            onChange={(e) => setMatricule(e.target.value)}
+                            focusBorderColor="#D5Ad36"
+                        />
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button colorScheme="yellow" bg="#D5Ad36" mr={3} onClick={confirmLoan}>
+                            Confirm
+                        </Button>
+                        <Button onClick={onClose}>Cancel</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Box>
     );
 };

@@ -5,6 +5,7 @@ import Content from './components/Content';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Ouvrage from './components/Ouvrage';
 import SearchLivre from './components/livres/SearchLivre';
+import CheckRequest from './components/livres/checkRequest';
 
 
 function App() {
@@ -36,7 +37,7 @@ function App() {
      
       <Content></Content>   
           <Routes>         
-              
+              <Route path='/checkRequest' element={<CheckRequest/>}/>
               <Route path="/ouvrage" element={<Ouvrage/>}/>
               <Route path='/Search' element={<SearchLivre data={booksData}/>}/>
              
